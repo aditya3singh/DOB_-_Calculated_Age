@@ -21,17 +21,14 @@ import (
 )
 
 func main() {
-	// ── Logger ───────────────────────────────────────────────────────────────
 	logger.Init()
 	defer logger.Sync()
 
-	// ── Config ───────────────────────────────────────────────────────────────
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Fatal("failed to load config", zap.Error(err))
 	}
 
-	// ── Database ─────────────────────────────────────────────────────────────
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -46,18 +43,15 @@ func main() {
 	}
 	logger.Info("database connection established")
 
-	// ── Wire dependencies ─────────────────────────────────────────────────────
 	queries := db.New(pool)
 	userRepo := repository.NewUserRepository(queries)
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userSvc)
 
-	// ── Fiber app ─────────────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
 		AppName:      "go-users-api",
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		// Return structured JSON on Fiber errors.
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 			var e *fiber.Error
@@ -73,7 +67,6 @@ func main() {
 
 	routes.Register(app, userHandler)
 
-	// ── Graceful shutdown ─────────────────────────────────────────────────────
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 

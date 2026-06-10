@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config holds all application configuration loaded from environment variables.
 type Config struct {
 	ServerPort string
 	DBHost     string
@@ -18,9 +17,7 @@ type Config struct {
 	DBSSLMode  string
 }
 
-// Load reads the .env file (if present) and returns a populated Config.
 func Load() (*Config, error) {
-	// .env is optional — in Docker the vars come from the environment directly.
 	_ = godotenv.Load()
 
 	cfg := &Config{
@@ -36,7 +33,6 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-// DSN returns the PostgreSQL connection string.
 func (c *Config) DSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",

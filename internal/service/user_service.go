@@ -16,23 +16,18 @@ import (
 	"go.uber.org/zap"
 )
 
-// UserService holds business logic for user operations.
 type UserService struct {
 	repo *repository.UserRepository
 }
 
-// NewUserService creates a new UserService.
 func NewUserService(repo *repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-// CalculateAge computes a person's age given their date of birth.
-// It correctly handles the case where the birthday has not yet occurred this year.
 func CalculateAge(dob time.Time) int {
 	now := time.Now()
 	years := now.Year() - dob.Year()
 
-	// Roll back one year if the birthday has not yet occurred this calendar year.
 	birthdayThisYear := time.Date(now.Year(), dob.Month(), dob.Day(), 0, 0, 0, 0, now.Location())
 	if now.Before(birthdayThisYear) {
 		years--
@@ -40,7 +35,6 @@ func CalculateAge(dob time.Time) int {
 	return years
 }
 
-// CreateUser validates the DOB, persists the user, and returns the response DTO.
 func (s *UserService) CreateUser(ctx context.Context, req models.CreateUserRequest) (models.UserResponse, error) {
 	dob, err := parseDOB(req.DOB)
 	if err != nil {
@@ -57,7 +51,6 @@ func (s *UserService) CreateUser(ctx context.Context, req models.CreateUserReque
 	return toUserResponse(user), nil
 }
 
-// GetUserByID fetches a single user and appends the calculated age.
 func (s *UserService) GetUserByID(ctx context.Context, id int32) (models.UserWithAgeResponse, error) {
 	user, err := s.repo.GetByID(ctx, id)
 	if err != nil {
@@ -72,7 +65,6 @@ func (s *UserService) GetUserByID(ctx context.Context, id int32) (models.UserWit
 	return toUserWithAgeResponse(user), nil
 }
 
-// UpdateUser updates name/dob and returns the updated DTO.
 func (s *UserService) UpdateUser(ctx context.Context, id int32, req models.UpdateUserRequest) (models.UserResponse, error) {
 	dob, err := parseDOB(req.DOB)
 	if err != nil {
@@ -92,9 +84,7 @@ func (s *UserService) UpdateUser(ctx context.Context, id int32, req models.Updat
 	return toUserResponse(user), nil
 }
 
-// DeleteUser removes a user by ID.
 func (s *UserService) DeleteUser(ctx context.Context, id int32) error {
-	// Verify existence first so we can return a proper 404.
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -112,7 +102,6 @@ func (s *UserService) DeleteUser(ctx context.Context, id int32) error {
 	return nil
 }
 
-// ListUsers returns a paginated list of users with age.
 func (s *UserService) ListUsers(ctx context.Context, page, limit int) (models.ListUsersResponse, error) {
 	if page < 1 {
 		page = 1
@@ -158,12 +147,7 @@ func (s *UserService) ListUsers(ctx context.Context, page, limit int) (models.Li
 	}, nil
 }
 
-// ─── Sentinel errors ─────────────────────────────────────────────────────────
-
-// ErrUserNotFound is returned when a user cannot be found by ID.
 var ErrUserNotFound = errors.New("user not found")
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 func parseDOB(raw string) (pgtype.Date, error) {
 	t, err := time.Parse("2006-01-02", raw)

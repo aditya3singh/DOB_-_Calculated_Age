@@ -1,5 +1,4 @@
 services:
-  # ── PostgreSQL ────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: go_users_postgres
@@ -19,7 +18,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # ── Go API ────────────────────────────────────────────────────────────────
   api:
     build:
       context: .

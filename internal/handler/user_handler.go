@@ -13,17 +13,14 @@ import (
 
 var validate = validator.New()
 
-// UserHandler holds a reference to the user service.
 type UserHandler struct {
 	svc *service.UserService
 }
 
-// NewUserHandler creates a new UserHandler.
 func NewUserHandler(svc *service.UserService) *UserHandler {
 	return &UserHandler{svc: svc}
 }
 
-// CreateUser handles POST /users
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var req models.CreateUserRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -48,7 +45,6 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
-// GetUserByID handles GET /users/:id
 func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	id, err := parseID(c)
 	if err != nil {
@@ -72,7 +68,6 @@ func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
 
-// UpdateUser handles PUT /users/:id
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	id, err := parseID(c)
 	if err != nil {
@@ -109,7 +104,6 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
 
-// DeleteUser handles DELETE /users/:id
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	id, err := parseID(c)
 	if err != nil {
@@ -132,7 +126,6 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// ListUsers handles GET /users with optional ?page=1&limit=10
 func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
@@ -146,8 +139,6 @@ func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 func parseID(c *fiber.Ctx) (int32, error) {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 32)
