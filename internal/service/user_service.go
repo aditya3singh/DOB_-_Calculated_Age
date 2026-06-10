@@ -102,7 +102,7 @@ func (s *UserService) DeleteUser(ctx context.Context, id int32) error {
 	return nil
 }
 
-func (s *UserService) ListUsers(ctx context.Context, page, limit int) (models.ListUsersResponse, error) {
+func (s *UserService) ListUsers(ctx context.Context, page, limit int) ([]models.UserWithAgeResponse, models.PaginationMeta, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -115,13 +115,13 @@ func (s *UserService) ListUsers(ctx context.Context, page, limit int) (models.Li
 	users, err := s.repo.List(ctx, int32(limit), int32(offset))
 	if err != nil {
 		logger.Error("failed to list users", zap.Error(err))
-		return models.ListUsersResponse{}, fmt.Errorf("could not list users: %w", err)
+		return nil, models.PaginationMeta{}, fmt.Errorf("could not list users: %w", err)
 	}
 
 	total, err := s.repo.Count(ctx)
 	if err != nil {
 		logger.Error("failed to count users", zap.Error(err))
-		return models.ListUsersResponse{}, fmt.Errorf("could not count users: %w", err)
+		return nil, models.PaginationMeta{}, fmt.Errorf("could not count users: %w", err)
 	}
 
 	totalPages := int(total) / limit
@@ -136,14 +136,11 @@ func (s *UserService) ListUsers(ctx context.Context, page, limit int) (models.Li
 
 	logger.Info("users listed", zap.Int("page", page), zap.Int("limit", limit), zap.Int64("total", total))
 
-	return models.ListUsersResponse{
-		Data: data,
-		Pagination: models.PaginationMeta{
-			Page:       page,
-			Limit:      limit,
-			TotalItems: total,
-			TotalPages: totalPages,
-		},
+	return data, models.PaginationMeta{
+		Page:       page,
+		Limit:      limit,
+		TotalItems: total,
+		TotalPages: totalPages,
 	}, nil
 }
 

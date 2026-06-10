@@ -30,10 +30,6 @@ type PaginationMeta struct {
 	TotalPages int   `json:"total_pages"`
 }
 
-type ListUsersResponse struct {
-	Data       []UserWithAgeResponse `json:"data"`
-	Pagination PaginationMeta        `json:"pagination"`
-}
 
 type ErrorResponse struct {
 	Error string `json:"error"`

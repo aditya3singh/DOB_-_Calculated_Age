@@ -130,14 +130,19 @@ func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
 
-	resp, err := h.svc.ListUsers(c.Context(), page, limit)
+	data, meta, err := h.svc.ListUsers(c.Context(), page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
 			Error: err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(resp)
+	c.Set("X-Pagination-Page", strconv.Itoa(meta.Page))
+	c.Set("X-Pagination-Limit", strconv.Itoa(meta.Limit))
+	c.Set("X-Pagination-Total-Items", strconv.FormatInt(meta.TotalItems, 10))
+	c.Set("X-Pagination-Total-Pages", strconv.Itoa(meta.TotalPages))
+
+	return c.Status(fiber.StatusOK).JSON(data)
 }
 
 func parseID(c *fiber.Ctx) (int32, error) {
