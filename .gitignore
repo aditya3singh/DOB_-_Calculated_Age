@@ -11,9 +11,9 @@
 *.so
 *.dylib
 
-# The project binary (same name as the module root or cmd output)
-server
-user-api
+# The project binary at root level only (not cmd/server/ source directory)
+/server
+/user-api
 
 # Test artifacts
 *.test
@@ -81,4 +81,3 @@ temp/
 # Air (live reload tool)
 # ============================================================
 .air.toml
-tmp/
